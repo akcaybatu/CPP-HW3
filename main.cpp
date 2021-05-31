@@ -15,9 +15,10 @@ protected:
     string color;
 };
 
+
 class Line : public Shape {
 public:
-    Line(double x1, double y1, double x2, double y2) {
+    Line(string clr, double x1, double y1, double x2, double y2) {
         x = (double *) malloc(sizeof(double) * 2);
         y = (double *) malloc(sizeof(double) * 2);
         if (x == NULL || y == NULL) {
@@ -28,6 +29,7 @@ public:
         x[1] = x2;
         y[0] = y1;
         y[1] = y2;
+        color = clr;
 
     }
 
@@ -54,7 +56,7 @@ public:
 
 class VerticalLine : public Line {
 public:
-    VerticalLine(double x1, double y1, double length) {
+    VerticalLine(string clr, double x1, double y1, double length) {
         x = (double *) malloc(sizeof(double) * 2);
         y = (double *) malloc(sizeof(double) * 2);
         if (x == NULL || y == NULL) {
@@ -65,6 +67,8 @@ public:
         x[1] = x1;
         y[0] = y1;
         y[1] = y1 + length;
+        color = clr;
+
     }
 
     double getArea() const override {
@@ -80,7 +84,7 @@ public:
 
 class HorizontalLine : public Line {
 public:
-    HorizontalLine(double x1, double y1, double length) {
+    HorizontalLine(string clr, double x1, double y1, double length) {
         x = (double *) malloc(sizeof(double) * 2);
         y = (double *) malloc(sizeof(double) * 2);
         if (x == NULL || y == NULL) {
@@ -91,6 +95,8 @@ public:
         x[1] = x1 + length;
         y[0] = y1;
         y[1] = y1;
+        color = clr;
+
 
     }
 
@@ -106,7 +112,7 @@ public:
 
 class Triangle : public Shape {
 public:
-    Triangle(double x1, double y1, double x2, double y2, double x3, double y3) {
+    Triangle(string clr, double x1, double y1, double x2, double y2, double x3, double y3) {
         x = (double *) malloc(sizeof(double) * 3);
         y = (double *) malloc(sizeof(double) * 3);
         if (x == NULL || y == NULL) {
@@ -119,6 +125,8 @@ public:
         y[0] = y1;
         y[1] = y2;
         y[2] = y3;
+        color = clr;
+
     };
 
     ~Triangle() {
@@ -127,8 +135,9 @@ public:
     };
 
     double getArea() const {
-        double area = abs((x[1] - x[0])*(y[2] - y[0]) - (x[2] - x[0])*(y[1] - y[0]))/2.0;
+        double area = abs((x[1] - x[0]) * (y[2] - y[0]) - (x[2] - x[0]) * (y[1] - y[0])) / 2.0;
         return area;
+        // Koordinatlar soldan sağa doğru verilmek zorunda!
     };
 
     string toString() const {
@@ -137,7 +146,43 @@ public:
     }
 };
 
+class Parallelogram : public Shape {
+public:
+    Parallelogram(string clr, double x1, double y1, double x2, double y2, double x3, double y3) {
+        // Sol alt - Sol üst - Sağ alt sırası ile verilmek zorundadır.
+        x = (double *) malloc(sizeof(double) * 4);
+        y = (double *) malloc(sizeof(double) * 4);
+        if (x == NULL || y == NULL) {
+            std::cout << "Yeterli Bellek Tahsis Edilemedi\n";
+            exit(1);
+        }
+        x[0] = x1;
+        y[0] = y1;
+        x[1] = x2;
+        y[1] = y2;
+        x[2] = x3;
+        y[2] = y3;
+        x[3] = abs(x2 - x1) + x3;
+        y[3] = y3;
+        color = clr;
+
+        if (!((y[0] == y[3] && y[1] == y[3]) || (x[0] == x[1] && x[2] == x[3]))) {
+            std::cout << "Geçersiz Paralelkenar Girdiniz.";
+            exit(1);
+        }
+    };
+
+    ~Parallelogram() {
+        free(x);
+        free(y);
+    }
+    double getArea() const {
+        return abs((y[1]-y[0])*(x[2]-x[0]));
+    };
+};
+
+
 int main() {
-    Triangle a = {0.0, 0.0, 0.0, 1.0, 1.0, 1.0};
-    std::cout << a.getArea();
-}
+    Parallelogram a = {"purple",0,0,0,10,10,10};
+    std::cout<< a.getArea();
+};
